@@ -1,7 +1,7 @@
 package model.entity;
 import jakarta.persistence.*;
 
-import javax.xml.crypto.Data;
+import java.time.LocalDateTime;
 import java.math.BigDecimal;
 
 
@@ -16,8 +16,13 @@ public class PlantInstance {
     @JoinColumn(name="id_species")
     private PlantSpecies species;
 
+
+
     String name;
-    private Data plantedAt;
+    private LocalDateTime plantedAt;
+    private Boolean isActive = true;
+    private String healthStatus;
+    private LocalDateTime lastCheckAt;
     private BigDecimal currentHeightCm;
     private Integer currentPotSizeCm;
     private Integer currentState;  // 0 - ок, 1 - требует действия
@@ -29,9 +34,9 @@ public class PlantInstance {
     private Integer customSoilMoistureMax;
     private Integer customLightMin;
 
-    private Data lastWateredAt;
+    private LocalDateTime lastWateredAt;
 
-    public Data getPlantedAt() {
+    public LocalDateTime getPlantedAt() {
         return plantedAt;
     }
 
@@ -54,5 +59,15 @@ public class PlantInstance {
     public BigDecimal getCustomTempMin() {
         return customTempMin;
     }
+
+    public Integer getCurrentPotSizeCm() { return currentPotSizeCm; }
+    public void setCurrentState(Integer currentState) { this.currentState = currentState; }
+    public Integer getCurrentState() { return currentState; }
+    public Boolean getIsActive() { return isActive; }
+    public String getHealthStatus() { return healthStatus; }
+    public Integer getCustomSoilMoistureMin() { return customSoilMoistureMin; }
+    public Integer getCustomSoilMoistureMax() { return customSoilMoistureMax; }
+    public Integer getCustomLightMin() { return customLightMin; }
+    public String getName() { return name; }
 
 }

@@ -28,7 +28,8 @@ public class RecommendationService {
     }
 
     public void resolve(Long id, String feedback) {
-        Recommendation rec = findById(id);
+        Recommendation rec = recommendationRepository.findById(id).orElseThrow();
+
         rec.setIsResolved(true);
         rec.setResolvedAt(LocalDateTime.now());
         rec.setUserFeedback(feedback);
