@@ -4,6 +4,7 @@ import  model.entity.PlantInstance;
 import  model.entity.Recommendation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import repo.RecommendationRepository;
 
 import java.time.LocalDateTime;
 

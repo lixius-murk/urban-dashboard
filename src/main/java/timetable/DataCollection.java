@@ -3,11 +3,11 @@ package timetable;
 
 import model.entity.Telemetry;
 import model.entity.PlantInstance;
+import org.springframework.scheduling.annotation.Scheduled;
 import service.SensorService;
 import simulator.DataSimulator;
 import simulator.GatewaySimulator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import service.LogicEngine;
 

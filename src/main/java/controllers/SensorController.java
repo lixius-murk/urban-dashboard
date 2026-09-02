@@ -1,7 +1,8 @@
 package controllers;
 
 
-import model.entity.PlantInstance;
+import model.entity.*;
+import service.RecommendationService;
 import service.SensorService;
 import simulator.DataSimulator;
 import picocli.CommandLine;

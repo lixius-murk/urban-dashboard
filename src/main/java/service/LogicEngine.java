@@ -1,11 +1,16 @@
 package service;
 
-import  model.entity.PlantInstance;
-import  model.entity.Telemetry;
+import model.entity.*;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class LogicEngine {
@@ -25,7 +30,6 @@ public class LogicEngine {
     public void evaluate(Telemetry telemetry, PlantInstance plant) {
         List<Event> triggeredEvents = new ArrayList<>();
 
-        // 1. Проверка влажности почвы
         if (telemetry.getSoilMoisture() != null) {
             int minMoisture = getEffectiveSoilMoistureMin(plant);
             int maxMoisture = getEffectiveSoilMoistureMax(plant);
@@ -35,7 +39,6 @@ public class LogicEngine {
                         "WATERING", "Низкая влажность почвы: " + telemetry.getSoilMoisture() + "%");
                 triggeredEvents.add(event);
 
-                // Отправляем команду на полив
                 Command command = createCommand(plant, event, "WATERING",
                         Map.of("duration_seconds", 5, "amount_ml", 200));
                 commandService.sendCommand(command);
