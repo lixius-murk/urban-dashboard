@@ -31,43 +31,83 @@ public class Telemetry {
     private String source;  // SIMULATOR, GATEWAY
 
 
+    public Long getIdTelemetry() {
+        return idTelemetry;
+    }
+
     public void setIdTelemetry(Long idTelemetry) {
         this.idTelemetry = idTelemetry;
     }
 
-    public void setHumidityAir(Integer humidityAir) {
-        this.humidityAir = humidityAir;
-    }
-
-    public void setTemperature(BigDecimal temperature) {
-        this.temperature = temperature;
-    }
-
-    public void setSensor(Sensor sensor) {
-        this.sensor = sensor;
-    }
-
-    public void setLightLux(Integer lightLux) {
-        this.lightLux = lightLux;
-    }
-
-    public void setSoilMoisture(Integer soilMoisture) {
-        this.soilMoisture = soilMoisture;
-    }
-
-    public void setEc(BigDecimal ec) {
-        this.ec = ec;
+    public PlantInstance getPlant() {
+        return plant;
     }
 
     public void setPlant(PlantInstance plant) {
         this.plant = plant;
     }
 
-    public void setSource(String source) {
-        this.source = source;
+    public Sensor getSensor() {
+        return sensor;
+    }
+
+    public void setSensor(Sensor sensor) {
+        this.sensor = sensor;
+    }
+
+    public BigDecimal getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(BigDecimal temperature) {
+        this.temperature = temperature;
+    }
+
+    public Integer getHumidityAir() {
+        return humidityAir;
+    }
+
+    public void setHumidityAir(Integer humidityAir) {
+        this.humidityAir = humidityAir;
+    }
+
+    public Integer getSoilMoisture() {
+        return soilMoisture;
+    }
+
+    public void setSoilMoisture(Integer soilMoisture) {
+        this.soilMoisture = soilMoisture;
+    }
+
+    public BigDecimal getEc() {
+        return ec;
+    }
+
+    public void setEc(BigDecimal ec) {
+        this.ec = ec;
+    }
+
+    public Integer getLightLux() {
+        return lightLux;
+    }
+
+    public void setLightLux(Integer lightLux) {
+        this.lightLux = lightLux;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
     }
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 }

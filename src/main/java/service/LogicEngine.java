@@ -1,7 +1,10 @@
 package service;
 
-import model.entity.*;
-import org.json.JSONObject;
+import model.entity.Command;
+import model.entity.Event;
+import model.entity.PlantInstance;
+import model.entity.Recommendation;
+import model.entity.Telemetry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -15,21 +18,28 @@ import java.util.Map;
 @Service
 public class LogicEngine {
 
-    @Autowired
+    @Autowired(required = false)
     private EventService eventService;
 
-    @Autowired
+    @Autowired(required = false)
     private CommandService commandService;
 
-    @Autowired
+    @Autowired(required = false)
     private RecommendationService recommendationService;
 
     @Autowired
     private MockDeviceGateway deviceGateway;
 
+    @Autowired(required = false)
+    private PlantService plantService;
+
+    @Autowired(required = false)
+    private TelemetryService telemetryService;
+
     public void evaluate(Telemetry telemetry, PlantInstance plant) {
         List<Event> triggeredEvents = new ArrayList<>();
 
+        // 1. Проверка влажности почвы
         if (telemetry.getSoilMoisture() != null) {
             int minMoisture = getEffectiveSoilMoistureMin(plant);
             int maxMoisture = getEffectiveSoilMoistureMax(plant);
@@ -38,11 +48,6 @@ public class LogicEngine {
                 Event event = createEvent(plant, telemetry,
                         "WATERING", "Низкая влажность почвы: " + telemetry.getSoilMoisture() + "%");
                 triggeredEvents.add(event);
-
-                Command command = createCommand(plant, event, "WATERING",
-                        Map.of("duration_seconds", 5, "amount_ml", 200));
-                commandService.sendCommand(command);
-                deviceGateway.sendCommand(command);
             }
         }
 
@@ -54,11 +59,6 @@ public class LogicEngine {
                 Event event = createEvent(plant, telemetry,
                         "HEATING", "Низкая температура: " + telemetry.getTemperature() + "°C");
                 triggeredEvents.add(event);
-
-                Command command = createCommand(plant, event, "HEATING",
-                        Map.of("duration_seconds", 10, "target_temp", minTemp));
-                commandService.sendCommand(command);
-                deviceGateway.sendCommand(command);
             }
         }
 
@@ -70,11 +70,6 @@ public class LogicEngine {
                 Event event = createEvent(plant, telemetry,
                         "LIGHT_CONTROL", "Недостаточно света: " + telemetry.getLightLux() + " lux");
                 triggeredEvents.add(event);
-
-                Command command = createCommand(plant, event, "CURTAINS_OPEN",
-                        Map.of("action", "OPEN"));
-                commandService.sendCommand(command);
-                deviceGateway.sendCommand(command);
             }
         }
 
@@ -89,19 +84,40 @@ public class LogicEngine {
             recommendationService.save(rec);
         }
 
-        // 5. Проверка размеров (если есть данные)
-        // Вызывается отдельно из другого места или по расписанию
-
-        // Сохраняем все события
-        eventService.saveAll(triggeredEvents);
+        // Сохраняем события, затем для каждого создаем и отправляем команду.
+        // (Событие нужно сохранить первым, чтобы у него был id для Command.event)
+        List<Event> savedEvents = eventService.saveAll(triggeredEvents);
+        for (Event event : savedEvents) {
+            dispatchCommandFor(plant, event);
+        }
 
         // Обновляем состояние растения
-        if (!triggeredEvents.isEmpty()) {
-            plant.setCurrentState(1);  // требует действия
-            // plantService.update(plant);
-        } else {
-            plant.setCurrentState(0);  // все хорошо
+        Integer newState = savedEvents.isEmpty() ? 0 : 1; // 0 - все хорошо, 1 - требует действия
+        plant.setCurrentState(newState);
+        plantService.updateState(plant.getIdPlant(), newState);
+    }
+
+    private void dispatchCommandFor(PlantInstance plant, Event event) {
+        Command command;
+        switch (event.getEventType()) {
+            case "WATERING":
+                command = commandService.createCommand(plant, event, "WATERING",
+                        Map.of("duration_seconds", 5, "amount_ml", 200));
+                break;
+            case "HEATING":
+                command = commandService.createCommand(plant, event, "HEATING",
+                        Map.of("duration_seconds", 10, "target_temp", getEffectiveTempMin(plant)));
+                break;
+            case "LIGHT_CONTROL":
+                command = commandService.createCommand(plant, event, "CURTAINS_OPEN",
+                        Map.of("action", "OPEN"));
+                break;
+            default:
+                return;
         }
+        commandService.sendCommand(command);
+        deviceGateway.sendCommand(command);
+        eventService.markCommandSent(event.getIdEvent());
     }
 
     private Event createEvent(PlantInstance plant, Telemetry telemetry,
@@ -118,18 +134,30 @@ public class LogicEngine {
         return event;
     }
 
-    private Command createCommand(PlantInstance plant, Event event,
-                                  String type, Map<String, Object> payload) {
-        Command command = new Command();
-        command.setPlant(plant);
-        command.setEvent(event);
-        command.setCommandType(type);
-        command.setPayload(new JSONObject(payload));
-        command.setStatus("PENDING");
-        command.setRetryCount(0);
-        command.setMaxRetries(3);
-        command.setCreatedAt(LocalDateTime.now());
-        return command;
+    // Вспомогательные методы для получения эффективных порогов
+    // (то же самое, что и в DataSimulator — оба должны согласовываться с одним растением)
+    private int getEffectiveSoilMoistureMin(PlantInstance plant) {
+        return plant.getCustomSoilMoistureMin() != null
+                ? plant.getCustomSoilMoistureMin()
+                : plant.getSpecies().getSoilMoistureMin();
+    }
+
+    private int getEffectiveSoilMoistureMax(PlantInstance plant) {
+        return plant.getCustomSoilMoistureMax() != null
+                ? plant.getCustomSoilMoistureMax()
+                : plant.getSpecies().getSoilMoistureMax();
+    }
+
+    private BigDecimal getEffectiveTempMin(PlantInstance plant) {
+        return plant.getCustomTempMin() != null
+                ? plant.getCustomTempMin()
+                : plant.getSpecies().getTempMin();
+    }
+
+    private int getEffectiveLightMin(PlantInstance plant) {
+        return plant.getCustomLightMin() != null
+                ? plant.getCustomLightMin()
+                : plant.getSpecies().getLightMin();
     }
 
     // Метод для периодической проверки роста
@@ -137,9 +165,9 @@ public class LogicEngine {
     public void checkGrowth() {
         List<PlantInstance> plants = plantService.getAllActive();
         for (PlantInstance plant : plants) {
-            // Получаем последние показания роста
-            Telemetry latestTelemetry = telemetryService.getLatestByPlant(plant.getIdPlant());
+            Telemetry latestTelemetry = telemetryService.getLatestByPlant(plant.getIdPlant()).orElse(null);
             if (latestTelemetry == null || latestTelemetry.getSoilMoisture() == null) continue;
+            if (plant.getCurrentHeightCm() == null || plant.getCurrentPotSizeCm() == null) continue;
 
             BigDecimal currentHeight = plant.getCurrentHeightCm();
             BigDecimal potSize = BigDecimal.valueOf(plant.getCurrentPotSizeCm());

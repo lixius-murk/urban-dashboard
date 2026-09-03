@@ -1,14 +1,19 @@
 package controllers;
 
-
-import model.entity.*;
-import service.RecommendationService;
-import service.SensorService;
-import simulator.DataSimulator;
-import picocli.CommandLine;
+import model.PlantSettingsDto;
+import model.entity.Command;
+import model.entity.Event;
+import model.entity.PlantInstance;
+import model.entity.Recommendation;
+import model.entity.Telemetry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import service.CommandService;
+import service.EventService;
+import service.PlantService;
+import service.RecommendationService;
+import service.TelemetryService;
 
 import java.util.List;
 
@@ -24,6 +29,12 @@ public class SensorController {
 
     @Autowired
     private RecommendationService recommendationService;
+
+    @Autowired
+    private EventService eventService;
+
+    @Autowired
+    private CommandService commandService;
 
     @GetMapping
     public ResponseEntity<List<PlantInstance>> getAllPlants() {
@@ -76,7 +87,7 @@ public class SensorController {
         PlantInstance plant = plantService.findById(id).orElseThrow();
 
         Event event = eventService.createManualEvent(plant, "WATERING", "Ручной полив");
-        CommandLine.Command command = commandService.createManualCommand(plant, event, "WATERING");
+        Command command = commandService.createManualCommand(plant, event, "WATERING");
         commandService.sendCommand(command);
 
         return ResponseEntity.ok(command);

@@ -1,25 +1,29 @@
 package timetable;
 
-
-import model.entity.Telemetry;
 import model.entity.PlantInstance;
-import org.springframework.scheduling.annotation.Scheduled;
-import service.SensorService;
-import simulator.DataSimulator;
-import simulator.GatewaySimulator;
+import model.entity.Sensor;
+import model.entity.Telemetry;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import service.LogicEngine;
+import service.PlantService;
+import service.SensorService;
+import service.TelemetryService;
+import simulator.DataSimulator;
+import simulator.GatewaySimulator;
 
 import java.util.List;
 
 @Component
+@ConditionalOnProperty(name = "app.simulation.enabled", havingValue = "true", matchIfMissing = true)
 public class DataCollection {
 
-        @Autowired
+        @Autowired(required = false)
         private PlantService plantService;
 
-        @Autowired
+        @Autowired(required = false)
         private SensorService sensorService;
 
         @Autowired
@@ -28,19 +32,17 @@ public class DataCollection {
         @Autowired
         private GatewaySimulator gateway;
 
-        @Autowired
+        @Autowired(required = false)
         private TelemetryService telemetryService;
 
         @Autowired
         private LogicEngine logicEngine;
 
-        // Каждые 30 секунд генерируем новые показания
-        @Scheduled(fixedDelay = 30000)
+        @Scheduled(fixedDelayString = "${app.simulation.interval-seconds:30}000")
         public void collectData() {
             List<PlantInstance> activePlants = plantService.getAllActive();
 
             for (PlantInstance plant : activePlants) {
-                // Получаем все сенсоры, привязанные к растению
                 List<Sensor> sensors = sensorService.getSensorsByPlant(plant.getIdPlant());
 
                 for (Sensor sensor : sensors) {
@@ -53,4 +55,3 @@ public class DataCollection {
             }
         }
     }
-

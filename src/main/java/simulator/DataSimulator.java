@@ -1,6 +1,7 @@
 package simulator;
 
 import model.entity.PlantInstance;
+import model.entity.Sensor;
 import model.entity.Telemetry;
 import org.springframework.stereotype.Service;
 
@@ -75,30 +76,42 @@ public class DataSimulator {
         return newTemp.setScale(1, RoundingMode.HALF_UP);
     }
 
+    private Integer generateHumidityAir(PlantInstance plant, DeviceState state) {
+        Integer prevHum = state.getLastHumidityAir();
+        int min = getEffectiveHumMin(plant);
+        int max = getEffectiveHumMax(plant);
+
+        int base = prevHum != null ? prevHum : (min + max) / 2;
+        int delta = random.nextInt(20) - 10;
+        int newHum = Math.max(min, Math.min(max, base + delta));
+
+        state.setLastHumidityAir(newHum);
+        return newHum;
+    }
+
     private Integer generateSoilMoisture(PlantInstance plant, DeviceState state) {
         Integer prevMoisture = state.getLastSoilMoisture();
         Integer min = getEffectiveSoilMoistureMin(plant);
         Integer max = getEffectiveSoilMoistureMax(plant);
 
-        // Испарение: медленно снижается
-        double evaporationRate = 0.98; // 2% потери за цикл
+
+        //change for moisture rate!!!!
+        double evaporationRate = 0.98;
         int newMoisture = prevMoisture != null
                 ? (int)(prevMoisture * evaporationRate)
                 : (min + max) / 2;
 
-        // Если был недавний полив — резко повышаем
+
         if (state.isWateringActive()) {
-            newMoisture = Math.min(newMoisture + 25, max);
+            newMoisture = Math.min(newMoisture + 40, max);
             state.decrementWateringTimer();
         }
 
-        // Если был нагрев — ускоряем испарение
         if (state.isHeatingActive()) {
-            newMoisture = (int)(newMoisture * 0.95);
+            newMoisture = (int)(newMoisture * 0.8);
         }
 
-        // Дополнительное случайное колебание
-        newMoisture += random.nextInt(5) - 2;
+        newMoisture += random.nextInt(20) - 10;
         newMoisture = Math.max(min, Math.min(max, newMoisture));
 
         state.setLastSoilMoisture(newMoisture);
@@ -110,10 +123,9 @@ public class DataSimulator {
         int hour = now.getHour();
 
         if (hour < 7 || hour > 20) {
-            return 50;  //минимальное освещение (луна/подсветка)
+            return 50;
         }
 
-        // Дневной цикл: пик в 12-14 часов
         int peakHour = 13;
         int maxLight = 12000;
         int minLight = 500;
@@ -133,6 +145,21 @@ public class DataSimulator {
         return Math.min(maxLight, Math.max(50, light));
     }
 
+    private BigDecimal generateEc(PlantInstance plant, DeviceState state) {
+        BigDecimal prevEc = state.getLastEc();
+        // EC медленно снижается между подкормками, с небольшим случайным шумом
+        BigDecimal base = prevEc != null ? prevEc : BigDecimal.valueOf(1.5);
+        BigDecimal drift = BigDecimal.valueOf(-0.01 + random.nextDouble() * 0.02);
+        BigDecimal newEc = base.add(drift);
+
+        if (newEc.compareTo(BigDecimal.ZERO) < 0) {
+            newEc = BigDecimal.ZERO;
+        }
+
+        state.setLastEc(newEc);
+        return newEc.setScale(2, RoundingMode.HALF_UP);
+    }
+
     // Вспомогательные методы для получения эффективных порогов
     private BigDecimal getEffectiveTempMin(PlantInstance plant) {
         return plant.getCustomTempMin() != null
@@ -146,7 +173,30 @@ public class DataSimulator {
                 : plant.getSpecies().getTempMax();
     }
 
-    @Data
+    private int getEffectiveSoilMoistureMin(PlantInstance plant) {
+        return plant.getCustomSoilMoistureMin() != null
+                ? plant.getCustomSoilMoistureMin()
+                : plant.getSpecies().getSoilMoistureMin();
+    }
+
+    private int getEffectiveSoilMoistureMax(PlantInstance plant) {
+        return plant.getCustomSoilMoistureMax() != null
+                ? plant.getCustomSoilMoistureMax()
+                : plant.getSpecies().getSoilMoistureMax();
+    }
+
+    private int getEffectiveHumMin(PlantInstance plant) {
+        return plant.getCustomHumMin() != null
+                ? plant.getCustomHumMin()
+                : plant.getSpecies().getHumMin();
+    }
+
+    private int getEffectiveHumMax(PlantInstance plant) {
+        return plant.getCustomHumMax() != null
+                ? plant.getCustomHumMax()
+                : plant.getSpecies().getHumMax();
+    }
+
     private static class DeviceState {
         private BigDecimal lastTemperature;
         private Integer lastSoilMoisture;
@@ -160,6 +210,38 @@ public class DataSimulator {
         private int heatingTimer;
 
         private boolean curtainsOpen = true;
+
+        public BigDecimal getLastTemperature() {
+            return lastTemperature;
+        }
+
+        public void setLastTemperature(BigDecimal lastTemperature) {
+            this.lastTemperature = lastTemperature;
+        }
+
+        public Integer getLastSoilMoisture() {
+            return lastSoilMoisture;
+        }
+
+        public void setLastSoilMoisture(Integer lastSoilMoisture) {
+            this.lastSoilMoisture = lastSoilMoisture;
+        }
+
+        public Integer getLastHumidityAir() {
+            return lastHumidityAir;
+        }
+
+        public void setLastHumidityAir(Integer lastHumidityAir) {
+            this.lastHumidityAir = lastHumidityAir;
+        }
+
+        public BigDecimal getLastEc() {
+            return lastEc;
+        }
+
+        public void setLastEc(BigDecimal lastEc) {
+            this.lastEc = lastEc;
+        }
 
         public void decrementWateringTimer() {
             if (wateringTimer > 0) wateringTimer--;
