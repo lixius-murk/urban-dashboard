@@ -12,7 +12,6 @@ import service.PlantService;
 import service.SensorService;
 import service.TelemetryService;
 import simulator.DataSimulator;
-import simulator.GatewaySimulator;
 
 import java.util.List;
 
@@ -29,8 +28,6 @@ public class DataCollection {
         @Autowired
         private DataSimulator dataSimulator;
 
-        @Autowired
-        private GatewaySimulator gateway;
 
         @Autowired(required = false)
         private TelemetryService telemetryService;
@@ -48,7 +45,6 @@ public class DataCollection {
                 for (Sensor sensor : sensors) {
                     Telemetry telemetry = dataSimulator.generateTelemetry(plant, sensor);
 
-                    gateway.receiveTelemetry(telemetry);
                     telemetryService.save(telemetry);
                     logicEngine.evaluate(telemetry, plant);
                 }

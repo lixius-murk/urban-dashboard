@@ -32,7 +32,6 @@ public class DataSimulator {
         telemetry.setTimestamp(LocalDateTime.now());
         telemetry.setSource("SIMULATOR");
 
-        // Определяем тип сенсора и генерируем соответствующее значение
         String sensorType = sensor.getSensorType().getName();
 
         switch (sensorType) {

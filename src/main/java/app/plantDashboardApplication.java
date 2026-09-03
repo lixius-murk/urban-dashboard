@@ -12,8 +12,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EntityScan("model.entity")
 @EnableJpaRepositories("repo")
 @EnableScheduling
-public class UrbanDashboardApplication {
+public class plantDashboardApplication {
     public static void main(String[] args) {
-        SpringApplication.run(UrbanDashboardApplication.class, args);
+        SpringApplication.run(plantDashboardApplication.class, args);
     }
 }

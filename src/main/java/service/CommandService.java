@@ -19,10 +19,6 @@ public class CommandService {
     @Autowired(required = false)
     private CommandRepository commandRepository;
 
-    /**
-     * Builds and persists a PENDING command. Does not dispatch it to the device —
-     * that's MockDeviceGateway's job, called separately (see LogicEngine / SensorController).
-     */
     public Command createCommand(PlantInstance plant, Event event, String commandType, Map<String, Object> payload) {
         Command command = new Command();
         command.setPlant(plant);
@@ -40,10 +36,7 @@ public class CommandService {
         return createCommand(plant, event, commandType, Map.of("trigger", "MANUAL"));
     }
 
-    /**
-     * Marks the command as SENT. Actual transport happens via MockDeviceGateway;
-     * this just records that the command left the system.
-     */
+
     public void sendCommand(Command command) {
         commandRepository.markAsSent(command.getIdCommand(), "SENT");
     }
@@ -53,15 +46,11 @@ public class CommandService {
     }
 
     public void fail(Long commandId, String error) {
-        int retried = commandRepository.retryCommand(commandId, error);
-        if (retried == 0) {
-            // retries exhausted — leave the error message but there's nothing left to bump
-            commandRepository.findById(commandId).ifPresent(c -> {
+        commandRepository.findById(commandId).ifPresent(c -> {
                 c.setStatus("FAILED");
                 c.setErrorMessage(error);
                 commandRepository.save(c);
             });
-        }
     }
 
     public void cancel(Long commandId) {

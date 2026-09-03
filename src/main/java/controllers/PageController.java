@@ -11,10 +11,6 @@ public class PageController {
         return "index";
     }
 
-    @GetMapping("/contact")
-    public String contact() {
-        return "contact";
-    }
 
     @GetMapping("/privacy")
     public String privacy() {

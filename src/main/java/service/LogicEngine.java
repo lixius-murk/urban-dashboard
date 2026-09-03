@@ -39,7 +39,6 @@ public class LogicEngine {
     public void evaluate(Telemetry telemetry, PlantInstance plant) {
         List<Event> triggeredEvents = new ArrayList<>();
 
-        // 1. Проверка влажности почвы
         if (telemetry.getSoilMoisture() != null) {
             int minMoisture = getEffectiveSoilMoistureMin(plant);
             int maxMoisture = getEffectiveSoilMoistureMax(plant);
@@ -51,7 +50,6 @@ public class LogicEngine {
             }
         }
 
-        // 2. Проверка температуры
         if (telemetry.getTemperature() != null) {
             BigDecimal minTemp = getEffectiveTempMin(plant);
 
@@ -62,7 +60,6 @@ public class LogicEngine {
             }
         }
 
-        // 3. Проверка освещения
         if (telemetry.getLightLux() != null) {
             int minLight = getEffectiveLightMin(plant);
 
@@ -73,25 +70,21 @@ public class LogicEngine {
             }
         }
 
-        // 4. Проверка питания (EC)
         if (telemetry.getEc() != null && telemetry.getEc().compareTo(BigDecimal.valueOf(0.8)) < 0) {
             Recommendation rec = new Recommendation();
             rec.setPlant(plant);
             rec.setRecommendationType("FERTILIZE");
-            rec.setMessage("Низкий уровень питательных веществ (EC=" + telemetry.getEc() +
-                    " мСм/см). Рекомендуется внесение удобрений.");
+            rec.setMessage("Низкий уровень питательных веществ (EC=" + telemetry.getEc() + " мСм/см).");
             rec.setSeverity("WARNING");
             recommendationService.save(rec);
         }
 
-        // Сохраняем события, затем для каждого создаем и отправляем команду.
-        // (Событие нужно сохранить первым, чтобы у него был id для Command.event)
+        //saving the event first
         List<Event> savedEvents = eventService.saveAll(triggeredEvents);
         for (Event event : savedEvents) {
             dispatchCommandFor(plant, event);
         }
 
-        // Обновляем состояние растения
         Integer newState = savedEvents.isEmpty() ? 0 : 1; // 0 - все хорошо, 1 - требует действия
         plant.setCurrentState(newState);
         plantService.updateState(plant.getIdPlant(), newState);
@@ -134,8 +127,8 @@ public class LogicEngine {
         return event;
     }
 
-    // Вспомогательные методы для получения эффективных порогов
-    // (то же самое, что и в DataSimulator — оба должны согласовываться с одним растением)
+
+    //keeping up with datasimulator!!!
     private int getEffectiveSoilMoistureMin(PlantInstance plant) {
         return plant.getCustomSoilMoistureMin() != null
                 ? plant.getCustomSoilMoistureMin()
@@ -160,8 +153,9 @@ public class LogicEngine {
                 : plant.getSpecies().getLightMin();
     }
 
-    // Метод для периодической проверки роста
-    @Scheduled(cron = "0 0 12 * * *")  // каждый день в 12:00
+
+    //checking in 12:00
+    @Scheduled(cron = "0 0 12 * * *")
     public void checkGrowth() {
         List<PlantInstance> plants = plantService.getAllActive();
         for (PlantInstance plant : plants) {
@@ -175,14 +169,11 @@ public class LogicEngine {
                     ? BigDecimal.valueOf(plant.getSpecies().getRecommendedPotSizeCm())
                     : BigDecimal.valueOf(15);
 
-            // Если растение превысило 85% от размера горшка
-            if (currentHeight.compareTo(potSize.multiply(BigDecimal.valueOf(0.85))) > 0) {
+            if (currentHeight.compareTo(potSize.multiply(BigDecimal.valueOf(0.9))) > 0) {
                 Recommendation rec = new Recommendation();
                 rec.setPlant(plant);
                 rec.setRecommendationType("REPOT");
-                rec.setMessage(String.format(
-                        "Растение достигло высоты %.1f см при размере горшка %d см. " +
-                                "Рекомендуется пересадка в горшок %d см.",
+                rec.setMessage(String.format("Растение достигло высоты %.1f см при размере горшка %d см. " +  "Рекомендуется пересадка в горшок %d см.",
                         currentHeight, plant.getCurrentPotSizeCm(), recommendedSize.intValue()
                 ));
                 rec.setSeverity("INFO");

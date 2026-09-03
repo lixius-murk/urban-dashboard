@@ -24,21 +24,19 @@ public interface CommandRepository extends JpaRepository<Command, Long> {
     List<Command> findByCommandTypeOrderByCreatedAtDesc(String commandType);
 
 
-    // PENDING команды, которые нужно отправить (с ограничением количества попыток)
+    // PENDING for what needs to be sent
     @Query("SELECT c FROM Command c WHERE c.status = 'PENDING' " +
             "AND c.retryCount < c.maxRetries " +
             "ORDER BY c.createdAt ASC")
     List<Command> findPendingCommandsToSend();
 
 
-    // Обновить статус команды
     @Modifying
     @Transactional
     @Query("UPDATE Command c SET c.status = :status, c.sentAt = CURRENT_TIMESTAMP " +
             "WHERE c.idCommand = :id")
     int markAsSent(@Param("id") Long id, @Param("status") String status);
 
-    // Отметить получение ACK
     @Modifying
     @Transactional
     @Query("UPDATE Command c SET c.status = 'ACKNOWLEDGED', " +
@@ -46,15 +44,6 @@ public interface CommandRepository extends JpaRepository<Command, Long> {
             "c.completedAt = CURRENT_TIMESTAMP " +
             "WHERE c.idCommand = :id")
     int markAsAcknowledged(@Param("id") Long id);
-
-    // Отметить ошибку
-    @Modifying
-    @Transactional
-    @Query("UPDATE Command c SET c.status = 'PENDING', " +
-            "c.retryCount = c.retryCount + 1, " +
-            "c.errorMessage = :error " +
-            "WHERE c.idCommand = :id AND c.retryCount < c.maxRetries")
-    int retryCommand(@Param("id") Long id, @Param("error") String error);
 
 
     @Modifying

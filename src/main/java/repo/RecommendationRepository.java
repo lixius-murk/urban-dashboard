@@ -54,14 +54,11 @@ public interface RecommendationRepository extends JpaRepository<Recommendation, 
     int resolveAllByPlant(@Param("plantId") Long plantId);
 
 
-    // Количество неразрешенных рекомендаций
     long countByIsResolvedFalse();
 
-    // Количество неразрешенных рекомендаций по растению
     long countByPlant_IdPlantAndIsResolvedFalse(Long plantId);
 
 
-    // Количество по серьезности
     @Query("SELECT r.severity, COUNT(r) FROM Recommendation r " +
             "WHERE r.isResolved = false GROUP BY r.severity")
     List<Object[]> countUnresolvedBySeverity();

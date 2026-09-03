@@ -44,7 +44,7 @@ public class PlantService {
         if (settings.getName() != null) {
             plant.setName(settings.getName());
         }
-        // Custom thresholds override species defaults; null means "use species default"
+        // null means use species default
         plant.setCustomTempMin(settings.getCustomTempMin());
         plant.setCustomTempMax(settings.getCustomTempMax());
         plant.setCustomHumMin(settings.getCustomHumMin());
