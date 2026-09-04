@@ -1,0 +1,1 @@
+DROP TABLE plant_instances, sensor_types, sensors, plant_species CASCADE;

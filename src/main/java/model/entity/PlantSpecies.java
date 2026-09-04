@@ -1,5 +1,6 @@
 package model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -26,6 +27,7 @@ public class PlantSpecies {
     private Boolean isActive = true;
 
     @OneToMany(mappedBy = "species")
+    @JsonIgnore
     private List<PlantInstance> instances;
 
     public Long getIdSpecies() {

@@ -1,6 +1,7 @@
 package model.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -10,7 +11,7 @@ import java.util.List;
 @Table(name = "plant_instances")
 public class PlantInstance {
     @Id
-    @GeneratedValue()
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idPlant;
 
     @ManyToOne
@@ -36,6 +37,7 @@ public class PlantInstance {
     private LocalDateTime lastWateredAt;
 
     @OneToMany(mappedBy = "plant")
+    @JsonIgnore
     private List<Sensor> sensors;
 
     public LocalDateTime getPlantedAt() {
