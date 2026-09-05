@@ -1,10 +1,7 @@
 package model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
-import java.util.List;
 
 @Entity
 @Table(name = "plant_species")
@@ -12,109 +9,34 @@ public class PlantSpecies {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idSpecies;
+    private Long id;
 
     private String name;
+    private String description;
 
-    private BigDecimal tempMin;
-    private BigDecimal tempMax;
-    private Integer humMin;
-    private Integer humMax;
-    private Integer soilMoistureMin;
-    private Integer soilMoistureMax;
-    private Integer lightMin;
-    private Integer recommendedPotSizeCm;
-    private Boolean isActive = true;
+    private BigDecimal tempMin = BigDecimal.valueOf(18);
+    private Integer soilMoistureMin = 40;
+    private Integer lightMin = 1000;
+    private Integer recommendedPotSize = 15;
 
-    @OneToMany(mappedBy = "species")
-    @JsonIgnore
-    private List<PlantInstance> instances;
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Long getIdSpecies() {
-        return idSpecies;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName() {
-        return name;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public BigDecimal getTempMin() { return tempMin; }
+    public void setTempMin(BigDecimal tempMin) { this.tempMin = tempMin; }
 
-    public BigDecimal getTempMin() {
-        return tempMin;
-    }
+    public Integer getSoilMoistureMin() { return soilMoistureMin; }
+    public void setSoilMoistureMin(Integer soilMoistureMin) { this.soilMoistureMin = soilMoistureMin; }
 
-    public void setTempMin(BigDecimal tempMin) {
-        this.tempMin = tempMin;
-    }
+    public Integer getLightMin() { return lightMin; }
+    public void setLightMin(Integer lightMin) { this.lightMin = lightMin; }
 
-    public BigDecimal getTempMax() {
-        return tempMax;
-    }
-
-    public void setTempMax(BigDecimal tempMax) {
-        this.tempMax = tempMax;
-    }
-
-    public Integer getHumMin() {
-        return humMin;
-    }
-
-    public void setHumMin(Integer humMin) {
-        this.humMin = humMin;
-    }
-
-    public Integer getHumMax() {
-        return humMax;
-    }
-
-    public void setHumMax(Integer humMax) {
-        this.humMax = humMax;
-    }
-
-    public Integer getSoilMoistureMin() {
-        return soilMoistureMin;
-    }
-
-    public void setSoilMoistureMin(Integer soilMoistureMin) {
-        this.soilMoistureMin = soilMoistureMin;
-    }
-
-    public Integer getSoilMoistureMax() {
-        return soilMoistureMax;
-    }
-
-    public void setSoilMoistureMax(Integer soilMoistureMax) {
-        this.soilMoistureMax = soilMoistureMax;
-    }
-
-    public Integer getLightMin() {
-        return lightMin;
-    }
-
-    public void setLightMin(Integer lightMin) {
-        this.lightMin = lightMin;
-    }
-
-    public Integer getRecommendedPotSizeCm() {
-        return recommendedPotSizeCm;
-    }
-
-    public void setRecommendedPotSizeCm(Integer recommendedPotSizeCm) {
-        this.recommendedPotSizeCm = recommendedPotSizeCm;
-    }
-
-    public Boolean getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    public List<PlantInstance> getInstances() {
-        return instances;
-    }
+    public Integer getRecommendedPotSize() { return recommendedPotSize; }
+    public void setRecommendedPotSize(Integer recommendedPotSize) { this.recommendedPotSize = recommendedPotSize; }
 }

@@ -1,17 +1,16 @@
 package model.entity;
 
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
 
 @Entity
 @Table(name = "telemetry")
 public class Telemetry {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idTelemetry;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "id_plant")
@@ -21,93 +20,49 @@ public class Telemetry {
     @JoinColumn(name = "id_sensor")
     private Sensor sensor;
 
-    private BigDecimal temperature;
-    private Integer humidityAir;
+    private BigDecimal temp;
+    private Integer humidity;
     private Integer soilMoisture;
-    private BigDecimal ec;
-    private Integer lightLux;
+    private Integer light;
 
     private LocalDateTime timestamp;
-    private String source;  // SIMULATOR, GATEWAY
 
+    public Telemetry() {}
 
-    public Long getIdTelemetry() {
-        return idTelemetry;
-    }
-
-    public void setIdTelemetry(Long idTelemetry) {
-        this.idTelemetry = idTelemetry;
-    }
-
-    public PlantInstance getPlant() {
-        return plant;
-    }
-
-    public void setPlant(PlantInstance plant) {
+    public Telemetry(PlantInstance plant, BigDecimal temp, Integer humidity, Integer soilMoisture, Integer light) {
         this.plant = plant;
-    }
-
-    public Sensor getSensor() {
-        return sensor;
-    }
-
-    public void setSensor(Sensor sensor) {
-        this.sensor = sensor;
-    }
-
-    public BigDecimal getTemperature() {
-        return temperature;
-    }
-
-    public void setTemperature(BigDecimal temperature) {
-        this.temperature = temperature;
-    }
-
-    public Integer getHumidityAir() {
-        return humidityAir;
-    }
-
-    public void setHumidityAir(Integer humidityAir) {
-        this.humidityAir = humidityAir;
-    }
-
-    public Integer getSoilMoisture() {
-        return soilMoisture;
-    }
-
-    public void setSoilMoisture(Integer soilMoisture) {
+        this.temp = temp;
+        this.humidity = humidity;
         this.soilMoisture = soilMoisture;
+        this.light = light;
+        this.timestamp = LocalDateTime.now();
     }
 
-    public BigDecimal getEc() {
-        return ec;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setEc(BigDecimal ec) {
-        this.ec = ec;
-    }
+    public PlantInstance getPlant() { return plant; }
+    public void setPlant(PlantInstance plant) { this.plant = plant; }
 
-    public Integer getLightLux() {
-        return lightLux;
-    }
+    public Sensor getSensor() { return sensor; }
+    public void setSensor(Sensor sensor) { this.sensor = sensor; }
 
-    public void setLightLux(Integer lightLux) {
-        this.lightLux = lightLux;
-    }
+    public BigDecimal getTemp() { return temp; }
+    public void setTemp(BigDecimal temp) { this.temp = temp; }
 
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
+    public Integer getHumidity() { return humidity; }
+    public void setHumidity(Integer humidity) { this.humidity = humidity; }
 
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
+    public Integer getSoilMoisture() { return soilMoisture; }
+    public void setSoilMoisture(Integer soilMoisture) { this.soilMoisture = soilMoisture; }
 
-    public String getSource() {
-        return source;
-    }
+    public Integer getLight() { return light; }
+    public void setLight(Integer light) { this.light = light; }
 
-    public void setSource(String source) {
-        this.source = source;
+    public LocalDateTime getTimestamp() { return timestamp; }
+    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
+
+    public String getTime() {
+        return timestamp != null ? timestamp.toString() : null;
     }
 }

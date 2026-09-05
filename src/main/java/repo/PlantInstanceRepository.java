@@ -25,7 +25,6 @@ public interface PlantInstanceRepository extends JpaRepository<PlantInstance, Lo
     //state (0 - хорошо, 1 - требует внимания)
     List<PlantInstance> findByCurrentState(Integer state);
 
-    List<PlantInstance> findByHealthStatus(String healthStatus);
 
     List<PlantInstance> findByNameContainingIgnoreCase(String name);
 
@@ -33,7 +32,7 @@ public interface PlantInstanceRepository extends JpaRepository<PlantInstance, Lo
             "LEFT JOIN FETCH p.species " +
             "LEFT JOIN FETCH p.sensors " +
             "WHERE p.idPlant = :id")
-    Optional<PlantInstance> findByIdWithDetails(@Param("id") Long id);
+    Optional<PlantInstance> findById(@Param("id") Long id);
 
     @Query("SELECT p, t FROM PlantInstance p " +
             "LEFT JOIN Telemetry t ON t.plant = p " +
@@ -54,8 +53,6 @@ public interface PlantInstanceRepository extends JpaRepository<PlantInstance, Lo
     @Query("SELECT p.species.name, COUNT(p) FROM PlantInstance p GROUP BY p.species.name")
     List<Object[]> countBySpecies();
 
-    @Query("SELECT p.healthStatus, COUNT(p) FROM PlantInstance p GROUP BY p.healthStatus")
-    List<Object[]> countByHealthStatus();
 
     @Modifying
     @Transactional
@@ -73,9 +70,15 @@ public interface PlantInstanceRepository extends JpaRepository<PlantInstance, Lo
     int updateHeight(@Param("id") Long id, @Param("height") Double height);
 
 
+
+    @Query("SELECT COUNT(*) FROM PlantInstance p " +
+            "WHERE p.isActive = true")
     long countByIsActiveTrue();
 
-    long countByCurrentState(Integer state);
+
+    @Query("SELECT COUNT(*) FROM PlantInstance p " +
+            "WHERE p.currentState =: state")
+    long countByState(@Param("currentState")Integer state);
 
     @Query("SELECT AVG(p.currentHeightCm) FROM PlantInstance p WHERE p.isActive = true")
     Double getAverageHeight();

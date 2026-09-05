@@ -8,52 +8,39 @@ public class Sensor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idSensor;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "id_plant")
     private PlantInstance plant;
 
-    @ManyToOne
-    @JoinColumn(name = "id_sensor_type")
-    private SensorType sensorType;
-
+    private String type; // TEMPERATURE, HUMIDITY, SOIL_MOISTURE, LIGHT
     private String label;
-    private Boolean isActive = true;
+    private Boolean active = true;
 
-    public Long getIdSensor() {
-        return idSensor;
-    }
+    public Sensor() {}
 
-    public PlantInstance getPlant() {
-        return plant;
-    }
-
-    public void setPlant(PlantInstance plant) {
+    public Sensor(PlantInstance plant, String type, String label) {
         this.plant = plant;
-    }
-
-    public SensorType getSensorType() {
-        return sensorType;
-    }
-
-    public void setSensorType(SensorType sensorType) {
-        this.sensorType = sensorType;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
+        this.type = type;
         this.label = label;
     }
 
-    public Boolean getIsActive() {
-        return isActive;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
+    public PlantInstance getPlant() { return plant; }
+    public void setPlant(PlantInstance plant) { this.plant = plant; }
+
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+
+    public String getLabel() { return label; }
+    public void setLabel(String label) { this.label = label; }
+
+    public Boolean getActive() { return active; }
+    public void setActive(Boolean active) { this.active = active; }
+
+    public Long getIdSensor() { return id; }
+    public Boolean getIsActive() { return active; }
 }

@@ -12,7 +12,7 @@ import java.util.Optional;
 @Service
 public class TelemetryService {
 
-    @Autowired(required = false)
+    @Autowired
     private TelemetryRepository telemetryRepository;
 
     public Telemetry save(Telemetry telemetry) {

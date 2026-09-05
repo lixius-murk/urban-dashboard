@@ -35,8 +35,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findByPlant_IdPlantAndTimestampBetweenOrderByTimestampDesc(
             Long plantId, LocalDateTime from, LocalDateTime to);
 
-    @Query("SELECT e FROM Event e ORDER BY e.timestamp DESC LIMIT 50")
-    List<Event> findLast50Events();
+    @Query("SELECT e FROM Event e ORDER BY e.timestamp DESC LIMIT 20")
+    List<Event> findLast20Events();
 
     @Query("SELECT e.eventType, COUNT(e) FROM Event e " +
             "WHERE e.timestamp >= :since GROUP BY e.eventType")

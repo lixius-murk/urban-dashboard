@@ -1,7 +1,6 @@
 package model.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -10,115 +9,43 @@ public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idEvent;
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "id_plant")
-    private PlantInstance plant;
+    @Column(name = "id_plant")
+    private Long plantId;
 
-    @ManyToOne
-    @JoinColumn(name = "id_telemetry")
-    private Telemetry telemetry;
+    private String type; // WATERING, HEATING, LIGHT_CONTROL
+    private String action;
+    private LocalDateTime time;
 
-    private String eventType;   // WATERING, HEATING, LIGHT_CONTROL, ...
-    private String triggerType; // AUTO, MANUAL
-    private Integer priority;
-    private Integer eventState; // 0-ожидание,1-обработка,2-выполнено,3-ошибка
-    private String actionTaken;
-    private String errorMessage;
-    private Boolean commandSent = false;
-    private Boolean commandAcked = false;
-    private LocalDateTime timestamp;
+    //0-pending, 1-completed, 2-failed
+    private Integer status = 0;
 
-    public Long getIdEvent() {
-        return idEvent;
+    public Event() {}
+
+    public Event(Long plantId, String type, String action) {
+        this.plantId = plantId;
+        this.type = type;
+        this.action = action;
+        this.time = LocalDateTime.now();
     }
 
-    public PlantInstance getPlant() {
-        return plant;
-    }
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setPlant(PlantInstance plant) {
-        this.plant = plant;
-    }
+    public Long getPlantId() { return plantId; }
+    public void setPlantId(Long plantId) { this.plantId = plantId; }
 
-    public Telemetry getTelemetry() {
-        return telemetry;
-    }
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
 
-    public void setTelemetry(Telemetry telemetry) {
-        this.telemetry = telemetry;
-    }
+    public String getAction() { return action; }
+    public void setAction(String action) { this.action = action; }
 
-    public String getEventType() {
-        return eventType;
-    }
+    public LocalDateTime getTime() { return time; }
+    public void setTime(LocalDateTime time) { this.time = time; }
 
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-    }
-
-    public String getTriggerType() {
-        return triggerType;
-    }
-
-    public void setTriggerType(String triggerType) {
-        this.triggerType = triggerType;
-    }
-
-    public Integer getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Integer priority) {
-        this.priority = priority;
-    }
-
-    public Integer getEventState() {
-        return eventState;
-    }
-
-    public void setEventState(Integer eventState) {
-        this.eventState = eventState;
-    }
-
-    public String getActionTaken() {
-        return actionTaken;
-    }
-
-    public void setActionTaken(String actionTaken) {
-        this.actionTaken = actionTaken;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-    }
-
-    public Boolean getCommandSent() {
-        return commandSent;
-    }
-
-    public void setCommandSent(Boolean commandSent) {
-        this.commandSent = commandSent;
-    }
-
-    public Boolean getCommandAcked() {
-        return commandAcked;
-    }
-
-    public void setCommandAcked(Boolean commandAcked) {
-        this.commandAcked = commandAcked;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
 }

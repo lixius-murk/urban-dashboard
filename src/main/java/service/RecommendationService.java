@@ -1,6 +1,5 @@
 package service;
 
-import model.entity.PlantInstance;
 import model.entity.Recommendation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,42 +11,44 @@ import java.util.List;
 @Service
 public class RecommendationService {
 
-    @Autowired(required = false)
+    @Autowired
     private RecommendationRepository recommendationRepository;
-
-    @Autowired(required = false)
-    private WebSocketService webSocketService;
-
-    public Recommendation save(Recommendation recommendation) {
-        Recommendation saved = recommendationRepository.save(recommendation);
-
-        PlantInstance plant = saved.getPlant();
-        if (plant != null && Boolean.TRUE.equals(plant.getIsActive())) {
-            webSocketService.sendRecommendation(plant, saved);
-        }
-        return saved;
-    }
-
-    public void resolve(Long id, String feedback) {
-        Recommendation rec = recommendationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Recommendation not found: " + id));
-        rec.setIsResolved(true);
-        rec.setResolvedAt(LocalDateTime.now());
-        rec.setUserFeedback(feedback);
-        recommendationRepository.save(rec);
-        webSocketService.sendRecommendation(rec.getPlant(), rec);
-    }
-
-    public List<Recommendation> getByPlant(Long plantId) {
-        return recommendationRepository.findByPlant_IdPlantOrderByCreatedAtDesc(plantId);
-    }
-
-    public List<Recommendation> getUnresolved(int limit) {
-        List<Recommendation> unresolved = recommendationRepository.findByIsResolvedFalseOrderByCreatedAtAsc();
-        return unresolved.size() > limit ? unresolved.subList(0, limit) : unresolved;
-    }
 
     public long countUnresolved() {
         return recommendationRepository.countByIsResolvedFalse();
+    }
+
+    public List<Object[]> getUnresolved() {
+        return recommendationRepository.getUnresolved();
+    }
+
+    public List<Recommendation> getUnresolvedList() {
+        return recommendationRepository.findByIsResolvedFalseOrderByCreatedAtAsc();
+    }
+
+    public void resolve(Long recId) {
+        recommendationRepository.resolve(recId);
+    }
+
+    public List<Recommendation> getByPlant(Long plantId) {
+        return recommendationRepository.getByPlantId(plantId);
+    }
+
+    public List<Recommendation> getUnresByPlant(Long plantId) {
+        return recommendationRepository.getUnresByPlantId(plantId);
+    }
+
+    public Recommendation save(Recommendation recommendation) {
+        recommendation.setCreatedAt(LocalDateTime.now());
+        recommendation.setResolved(false);
+        return recommendationRepository.save(recommendation);
+    }
+
+    public List<Recommendation> saveAll(List<Recommendation> recommendations) {
+        for (Recommendation rec : recommendations) {
+            rec.setCreatedAt(LocalDateTime.now());
+            rec.setResolved(false);
+        }
+        return recommendationRepository.saveAll(recommendations);
     }
 }

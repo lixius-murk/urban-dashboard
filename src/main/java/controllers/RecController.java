@@ -16,8 +16,8 @@ public class RecController {
     private RecommendationService recommendationService;
 
     @GetMapping("/unresolved")
-    public ResponseEntity<List<Recommendation>> getUnresolved(@RequestParam(defaultValue = "20") int limit) {
-        return ResponseEntity.ok(recommendationService.getUnresolved(limit));
+    public ResponseEntity<List<Object[]>> getUnresolved() {
+        return ResponseEntity.ok(recommendationService.getUnresolved());
     }
 
     @GetMapping("/plant/{plantId}")
@@ -27,7 +27,7 @@ public class RecController {
 
     @PostMapping("/{id}/resolve")
     public ResponseEntity<Void> resolve(@PathVariable Long id, @RequestBody(required = false) String feedback) {
-        recommendationService.resolve(id, feedback);
+        recommendationService.resolve(id);
         return ResponseEntity.ok().build();
     }
 }

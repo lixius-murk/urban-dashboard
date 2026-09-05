@@ -284,7 +284,7 @@
                 plantsDiv.innerHTML = `
                         <table>
                             <thead>
-                                <tr><th>ID</th><th>Название</th><th>Состояние</th><th>Здоровье</th><th></th></tr>
+                                <tr><th>ID</th><th>Название</th><th>Состояние</th><th></th></tr>
                             </thead>
                             <tbody>
                                 ${plants.map(p => `
@@ -323,11 +323,11 @@
             const detailTitle = document.getElementById('detailTitle');
             const detailContent = document.getElementById('detailContent');
 
-            detailTitle.innerHTML = `📊 ${plant.name} (ID: ${plant.id})`;
+            detailTitle.innerHTML = `${plant.name} (ID: ${plant.id})`;
 
             let recHtml = '';
             if (recommendations && recommendations.length) {
-                recHtml = `<h4>Рекомендации для этого растения:</h4><ul>`;
+                recHtml = `<h4>Рекомендации: </h4><ul>`;
                 recommendations.forEach(r => {
                     recHtml += `<li>${r.message} <small>(${r.severity})</small></li>`;
                 });

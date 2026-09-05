@@ -1,7 +1,6 @@
 package model.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -10,81 +9,52 @@ public class Recommendation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idRecommendation;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "id_plant")
     private PlantInstance plant;
 
-    private String recommendationType; // FERTILIZE, REPOT, ...
     private String message;
-    private String severity; // INFO, WARNING, CRITICAL
-    private Boolean isResolved = false;
-    private String userFeedback;
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private String severity;
+    private Boolean resolved = false;
+    private LocalDateTime createdAt;
     private LocalDateTime resolvedAt;
 
-    public Long getIdRecommendation() {
-        return idRecommendation;
+    public Recommendation() {
+        this.createdAt = LocalDateTime.now();
     }
 
-    public PlantInstance getPlant() {
-        return plant;
-    }
-
-    public void setPlant(PlantInstance plant) {
+    public Recommendation(PlantInstance plant, String message, String severity) {
         this.plant = plant;
-    }
-
-    public String getRecommendationType() {
-        return recommendationType;
-    }
-
-    public void setRecommendationType(String recommendationType) {
-        this.recommendationType = recommendationType;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
         this.message = message;
-    }
-
-    public String getSeverity() {
-        return severity;
-    }
-
-    public void setSeverity(String severity) {
         this.severity = severity;
+        this.resolved = false;
+        this.createdAt = LocalDateTime.now();
     }
 
-    public Boolean getIsResolved() {
-        return isResolved;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setIsResolved(Boolean isResolved) {
-        this.isResolved = isResolved;
-    }
+    public PlantInstance getPlant() { return plant; }
+    public void setPlant(PlantInstance plant) { this.plant = plant; }
 
-    public String getUserFeedback() {
-        return userFeedback;
-    }
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
 
-    public void setUserFeedback(String userFeedback) {
-        this.userFeedback = userFeedback;
-    }
+    public String getSeverity() { return severity; }
+    public void setSeverity(String severity) { this.severity = severity; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public Boolean getResolved() { return resolved; }
+    public void setResolved(Boolean resolved) { this.resolved = resolved; }
 
-    public LocalDateTime getResolvedAt() {
-        return resolvedAt;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setResolvedAt(LocalDateTime resolvedAt) {
-        this.resolvedAt = resolvedAt;
-    }
+    public LocalDateTime getResolvedAt() { return resolvedAt; }
+    public void setResolvedAt(LocalDateTime resolvedAt) { this.resolvedAt = resolvedAt; }
+
+    public Long getIdRecommendation() { return id; }
+    public Long getIdPlant() { return plant != null ? plant.getId() : null; }
+    public Boolean getIsResolved() { return resolved; }
 }

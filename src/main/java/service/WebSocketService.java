@@ -28,9 +28,9 @@ public class WebSocketService {
     }
 
     public void sendEvent(Event event) {
-        if (event == null || event.getPlant() == null || messagingTemplate == null) return;
+        if (event == null || event.getPlantId() == null || messagingTemplate == null) return;
         messagingTemplate.convertAndSend(
-                "/topic/plants/" + event.getPlant().getIdPlant() + "/events",
+                "/topic/plants/" + event.getPlantId() + "/events",
                 event
         );
     }

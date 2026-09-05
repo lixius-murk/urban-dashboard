@@ -22,7 +22,7 @@ public class EventController {
 
     @GetMapping("/plant/{plantId}")
     public ResponseEntity<List<Event>> getByPlant(@PathVariable Long plantId) {
-        return ResponseEntity.ok(eventService.getByPlant(plantId));
+        return ResponseEntity.ok(eventService.getByPlantId(plantId));
     }
 
     @PostMapping("/{id}/resolve")

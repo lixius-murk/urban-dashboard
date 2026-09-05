@@ -2,7 +2,6 @@ package model.entity;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,173 +9,80 @@ import java.util.List;
 @Entity
 @Table(name = "plant_instances")
 public class PlantInstance {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idPlant;
+    private Long id;
+
+    private String name;
 
     @ManyToOne
-    @JoinColumn(name="id_species")
+    @JoinColumn(name = "id_species")
     private PlantSpecies species;
 
-    String name;
-    private LocalDateTime plantedAt;
-    private BigDecimal currentHeightCm;
-    private Integer currentPotSizeCm;
-    private Integer currentState;  // 0 - ок, 1 - требует действия
-    private BigDecimal customTempMin;
-    private BigDecimal customTempMax;
-    private Integer customHumMin;
-    private Integer customHumMax;
-    private Integer customSoilMoistureMin;
-    private Integer customSoilMoistureMax;
-    private Integer customLightMin;
+    private BigDecimal height;
+    private Integer potSize;
+    private Integer state = 0;  // 0-healthy, 1-needs attention
 
-    private Boolean isActive = true;
-    private String healthStatus = "HEALTHY";
-    private LocalDateTime lastCheckAt;
-    private LocalDateTime lastWateredAt;
+    //all custom pars
+    private BigDecimal tempMin;
+    private Integer soilMoistureMin;
+    private Integer lightMin;
+
+    private LocalDateTime lastWatered;
+    private LocalDateTime lastChecked;
 
     @OneToMany(mappedBy = "plant")
     @JsonIgnore
     private List<Sensor> sensors;
 
-    public LocalDateTime getPlantedAt() {
-        return plantedAt;
-    }
+    public PlantInstance() {}
 
-    public void setPlantedAt(LocalDateTime plantedAt) {
-        this.plantedAt = plantedAt;
-    }
-
-    public PlantSpecies getSpecies() {
-        return species;
-    }
-
-    public void setSpecies(PlantSpecies species) {
-        this.species = species;
-    }
-
-    public BigDecimal getCurrentHeightCm() {
-        return currentHeightCm;
-    }
-
-    public void setCurrentHeightCm(BigDecimal currentHeightCm) {
-        this.currentHeightCm = currentHeightCm;
-    }
-
-    public Long getIdPlant() {
-        return idPlant;
-    }
-
-    public BigDecimal getCustomTempMax() {
-        return customTempMax;
-    }
-
-    public void setCustomTempMax(BigDecimal customTempMax) {
-        this.customTempMax = customTempMax;
-    }
-
-    public BigDecimal getCustomTempMin() {
-        return customTempMin;
-    }
-
-    public void setCustomTempMin(BigDecimal customTempMin) {
-        this.customTempMin = customTempMin;
-    }
-
-    public Integer getCustomHumMin() {
-        return customHumMin;
-    }
-
-    public void setCustomHumMin(Integer customHumMin) {
-        this.customHumMin = customHumMin;
-    }
-
-    public Integer getCustomHumMax() {
-        return customHumMax;
-    }
-
-    public void setCustomHumMax(Integer customHumMax) {
-        this.customHumMax = customHumMax;
-    }
-
-    public Integer getCustomSoilMoistureMin() {
-        return customSoilMoistureMin;
-    }
-
-    public void setCustomSoilMoistureMin(Integer customSoilMoistureMin) {
-        this.customSoilMoistureMin = customSoilMoistureMin;
-    }
-
-    public Integer getCustomSoilMoistureMax() {
-        return customSoilMoistureMax;
-    }
-
-    public void setCustomSoilMoistureMax(Integer customSoilMoistureMax) {
-        this.customSoilMoistureMax = customSoilMoistureMax;
-    }
-
-    public Integer getCustomLightMin() {
-        return customLightMin;
-    }
-
-    public void setCustomLightMin(Integer customLightMin) {
-        this.customLightMin = customLightMin;
-    }
-
-    public Integer getCurrentPotSizeCm() {
-        return currentPotSizeCm;
-    }
-
-    public void setCurrentPotSizeCm(Integer currentPotSizeCm) {
-        this.currentPotSizeCm = currentPotSizeCm;
-    }
-
-    public Integer getCurrentState() {
-        return currentState;
-    }
-
-    public void setCurrentState(Integer currentState) {
-        this.currentState = currentState;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
+    public PlantInstance(String name, PlantSpecies species) {
         this.name = name;
+        this.species = species;
+        this.state = 0;
     }
 
-    public Boolean getIsActive() {
-        return isActive;
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public PlantSpecies getSpecies() { return species; }
+    public void setSpecies(PlantSpecies species) { this.species = species; }
+
+    public BigDecimal getHeight() { return height; }
+    public void setHeight(BigDecimal height) { this.height = height; }
+
+    public Integer getPotSize() { return potSize; }
+    public void setPotSize(Integer potSize) { this.potSize = potSize; }
+
+    public Integer getState() { return state; }
+    public void setState(Integer state) { this.state = state; }
+
+    public BigDecimal getTempMin() { return tempMin; }
+    public void setTempMin(BigDecimal tempMin) { this.tempMin = tempMin; }
+
+    public Integer getSoilMoistureMin() { return soilMoistureMin; }
+    public void setSoilMoistureMin(Integer soilMoistureMin) { this.soilMoistureMin = soilMoistureMin; }
+
+    public Integer getLightMin() { return lightMin; }
+    public void setLightMin(Integer lightMin) { this.lightMin = lightMin; }
+
+    public LocalDateTime getLastWatered() { return lastWatered; }
+    public void setLastWatered(LocalDateTime lastWatered) { this.lastWatered = lastWatered; }
+
+    public LocalDateTime getLastChecked() { return lastChecked; }
+    public void setLastChecked(LocalDateTime lastChecked) { this.lastChecked = lastChecked; }
+
+    public List<Sensor> getSensors() { return sensors; }
+    public void setSensors(List<Sensor> sensors) { this.sensors = sensors; }
+
+    public String getHealth() {
+        return state == 0 ? "HEALTHY" : "NEEDS_ATTENTION";
     }
 
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    public String getHealthStatus() {
-        return healthStatus;
-    }
-
-    public void setHealthStatus(String healthStatus) {
-        this.healthStatus = healthStatus;
-    }
-
-    public LocalDateTime getLastCheckAt() {
-        return lastCheckAt;
-    }
-
-    public LocalDateTime getLastWateredAt() {
-        return lastWateredAt;
-    }
-
-    public void setLastWateredAt(LocalDateTime lastWateredAt) {
-        this.lastWateredAt = lastWateredAt;
-    }
-
-    public List<Sensor> getSensors() {
-        return sensors;
-    }
+    public Long getIdPlant() { return id; }
 }

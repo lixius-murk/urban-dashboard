@@ -1,5 +1,6 @@
 package repo;
 
+import model.entity.Event;
 import  model.entity.Recommendation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,8 +30,15 @@ public interface RecommendationRepository extends JpaRepository<Recommendation, 
             "ORDER BY r.severity DESC, r.createdAt ASC")
     List<Recommendation> findUnresolvedCritical();
 
-    List<Recommendation> findByPlant_IdPlantAndCreatedAtBetweenOrderByCreatedAtDesc(
-            Long plantId, LocalDateTime from, LocalDateTime to);
+
+    @Query("SELECT r FROM Recommendation r WHERE r.plant.idPlant = :plantId" +
+            "ORDER BY r.severity DESC, r.createdAt ASC")
+    List<Recommendation> getByPlantId(@Param("plantId") Long plantId);
+
+    @Query("SELECT r FROM Recommendation r WHERE r.isResolved = false AND r.plant.idPlant = :plantId" +
+            "ORDER BY r.severity DESC, r.createdAt ASC")
+    List<Recommendation> getUnresByPlantId(@Param("plantId") Long plantId);
+
 
     @Query("SELECT r.plant.idPlant, COUNT(r) FROM Recommendation r " +
             "WHERE r.isResolved = false " +
@@ -38,13 +46,16 @@ public interface RecommendationRepository extends JpaRepository<Recommendation, 
     List<Object[]> countUnresolvedByPlant();
 
 
+    @Query("SELECT  r.idRecommendation, r.plant.idPlant FROM Recommendation r " +
+            "WHERE r.isResolved = false ")
+    List<Object[]> getUnresolved();
+
     @Modifying
     @Transactional
     @Query("UPDATE Recommendation r SET r.isResolved = true, " +
             "r.resolvedAt = CURRENT_TIMESTAMP, " +
-            "r.userFeedback = :feedback " +
             "WHERE r.idRecommendation = :id")
-    int resolve(@Param("id") Long id, @Param("feedback") String feedback);
+    int resolve(@Param("id") Long id);
 
     //разрешение всех рекомендаций для растения
     @Modifying
@@ -53,7 +64,8 @@ public interface RecommendationRepository extends JpaRepository<Recommendation, 
             "WHERE r.plant.idPlant = :plantId AND r.isResolved = false")
     int resolveAllByPlant(@Param("plantId") Long plantId);
 
-
+    @Query("SELECT COUNT(*) FROM Recommendation r " +
+            "WHERE r.isResolved = false ")
     long countByIsResolvedFalse();
 
     long countByPlant_IdPlantAndIsResolvedFalse(Long plantId);
@@ -68,7 +80,5 @@ public interface RecommendationRepository extends JpaRepository<Recommendation, 
     @Query("DELETE FROM Recommendation r WHERE r.resolvedAt < :olderThan")
     int deleteOldResolved(@Param("olderThan") LocalDateTime olderThan);
 
-    Page<Recommendation> findByPlant_IdPlantOrderByCreatedAtDesc(Long plantId, Pageable pageable);
 
-    Page<Recommendation> findByIsResolvedFalseOrderByCreatedAtAsc(Pageable pageable);
 }

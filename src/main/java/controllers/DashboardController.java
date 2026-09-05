@@ -30,7 +30,7 @@ public class DashboardController {
         Map<String, Object> summary = new HashMap<>();
 
         long totalPlants = plantService.countActive();
-        long healthyPlants = plantService.countByHealthStatus("HEALTHY");
+        long healthyPlants = plantService.countByState(0);
         long plantsNeedingAttention = plantService.countByState(1);
         long pendingRecommendations = recommendationService.countUnresolved();
 
@@ -40,7 +40,7 @@ public class DashboardController {
         summary.put("pendingRecommendations", pendingRecommendations);
 
         summary.put("recentEvents", eventService.getRecent(10));
-        summary.put("recommendations", recommendationService.getUnresolved(5));
+        summary.put("recommendations", recommendationService.getUnresolvedList());
 
         return ResponseEntity.ok(summary);
     }
