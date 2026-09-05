@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface SensorRepository extends JpaRepository<Sensor, Long> {
 
-    List<Sensor> findByPlant_IdPlantAndIsActiveTrue(Long plantId);
+    List<Sensor> findByPlant_IdAndActiveTrue(Long plantId);
 
-    List<Sensor> findByPlant_IdPlant(Long plantId);
+    List<Sensor> findByPlant_Id(Long plantId);
 }

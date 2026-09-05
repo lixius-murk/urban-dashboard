@@ -15,11 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class DataSimulator {
-    final  BigDecimal MAX_TEMP = new BigDecimal(30);
-    final  Integer MAX_MOIS = 80;
-
     private final Random random = new Random();
 
+    // Store last values for smooth changes
     private final Map<Long, DeviceState> deviceStates = new ConcurrentHashMap<>();
 
     public Telemetry generateTelemetry(PlantInstance plant, Sensor sensor) {
@@ -32,25 +30,14 @@ public class DataSimulator {
         telemetry.setPlant(plant);
         telemetry.setSensor(sensor);
         telemetry.setTimestamp(LocalDateTime.now());
+        telemetry.setSource("SIMULATOR");
 
-        String sensorType = sensor.getType();
-
-        switch (sensorType) {
-            case "TEMPERATURE":
-                telemetry.setTemp(generateTemperature(plant, state));
-                break;
-            case "HUMIDITY_AIR":
-                telemetry.setHumidity(generateHumidityAir(plant, state));
-                break;
-            case "SOIL_MOISTURE":
-                telemetry.setSoilMoisture(generateSoilMoisture(plant, state));
-                break;
-            case "LIGHT":
-                telemetry.setLight(generateLight(plant, state));
-                break;
-            case "EC":
-                break;
-        }
+        // Set ALL values on every telemetry record
+        // This way the latest telemetry record always has all values
+        telemetry.setTemp(generateTemperature(plant, state));
+        telemetry.setHumidity(generateHumidityAir(plant, state));
+        telemetry.setSoilMoisture(generateSoilMoisture(plant, state));
+        telemetry.setLight(generateLight(plant, state));
 
         return telemetry;
     }
@@ -58,7 +45,7 @@ public class DataSimulator {
     private BigDecimal generateTemperature(PlantInstance plant, DeviceState state) {
         BigDecimal prevTemp = state.getLastTemperature();
         BigDecimal min = getEffectiveTempMin(plant);
-        BigDecimal max = MAX_TEMP;
+        BigDecimal max = getEffectiveTempMax(plant);
 
         LocalTime now = LocalTime.now();
         double timeFactor = Math.sin((now.getHour() - 6) * Math.PI / 12);
@@ -91,18 +78,21 @@ public class DataSimulator {
     private Integer generateSoilMoisture(PlantInstance plant, DeviceState state) {
         Integer prevMoisture = state.getLastSoilMoisture();
         Integer min = getEffectiveSoilMoistureMin(plant);
-        Integer max = MAX_MOIS;
+        Integer max = getEffectiveSoilMoistureMax(plant);
 
+        // Evaporation rate
         double evaporationRate = 0.98;
         int newMoisture = prevMoisture != null
                 ? (int)(prevMoisture * evaporationRate)
                 : (min + max) / 2;
 
+        // Simulate watering if active
         if (state.isWateringActive()) {
             newMoisture = Math.min(newMoisture + 40, max);
             state.decrementWateringTimer();
         }
 
+        // Random variation
         newMoisture += random.nextInt(20) - 10;
         newMoisture = Math.max(min, Math.min(max, newMoisture));
 
@@ -131,11 +121,15 @@ public class DataSimulator {
         return Math.min(maxLight, Math.max(50, light));
     }
 
-    //for thresholds
+    // Helper methods for effective thresholds
     private BigDecimal getEffectiveTempMin(PlantInstance plant) {
         return plant.getTempMin() != null
                 ? plant.getTempMin()
                 : plant.getSpecies().getTempMin();
+    }
+
+    private BigDecimal getEffectiveTempMax(PlantInstance plant) {
+        return plant.getSpecies().getTempMax();
     }
 
     private int getEffectiveSoilMoistureMin(PlantInstance plant) {
@@ -144,8 +138,11 @@ public class DataSimulator {
                 : plant.getSpecies().getSoilMoistureMin();
     }
 
+    private int getEffectiveSoilMoistureMax(PlantInstance plant) {
+        return plant.getSpecies().getSoilMoistureMax();
+    }
 
-
+    // Inner class for device state
     private static class DeviceState {
         private BigDecimal lastTemperature;
         private Integer lastSoilMoisture;

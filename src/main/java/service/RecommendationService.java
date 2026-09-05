@@ -15,7 +15,7 @@ public class RecommendationService {
     private RecommendationRepository recommendationRepository;
 
     public long countUnresolved() {
-        return recommendationRepository.countByIsResolvedFalse();
+        return recommendationRepository.countByResolvedFalse();
     }
 
     public List<Object[]> getUnresolved() {
@@ -23,7 +23,7 @@ public class RecommendationService {
     }
 
     public List<Recommendation> getUnresolvedList() {
-        return recommendationRepository.findByIsResolvedFalseOrderByCreatedAtAsc();
+        return recommendationRepository.findByResolvedFalseOrderByCreatedAtAsc();
     }
 
     public void resolve(Long recId) {

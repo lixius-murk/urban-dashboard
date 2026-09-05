@@ -1,9 +1,6 @@
 package repo;
 
-import model.entity.Event;
-import  model.entity.Recommendation;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import model.entity.Recommendation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,68 +14,59 @@ import java.util.List;
 @Repository
 public interface RecommendationRepository extends JpaRepository<Recommendation, Long> {
 
+    List<Recommendation> findByPlant_IdOrderByCreatedAtDesc(Long plantId);
 
-    List<Recommendation> findByPlant_IdPlantOrderByCreatedAtDesc(Long plantId);
 
-    List<Recommendation> findByIsResolvedFalseOrderByCreatedAtAsc();
+    @Query("SELECT r FROM Recommendation r WHERE r.resolved = false " +
+            "AND r.severity IN ('WARNING', 'CRITICAL') " +
+            "ORDER BY r.severity DESC, r.createdAt ASC")
+    List<Recommendation> findByResolvedFalseOrderByCreatedAtAsc();
 
     List<Recommendation> findBySeverityOrderByCreatedAtDesc(String severity);
 
-
-    @Query("SELECT r FROM Recommendation r WHERE r.isResolved = false " +
+    @Query("SELECT r FROM Recommendation r WHERE r.resolved = false " +
             "AND r.severity IN ('WARNING', 'CRITICAL') " +
             "ORDER BY r.severity DESC, r.createdAt ASC")
     List<Recommendation> findUnresolvedCritical();
 
-
-    @Query("SELECT r FROM Recommendation r WHERE r.plant.idPlant = :plantId" +
+    @Query("SELECT r FROM Recommendation r WHERE r.plant.id = :plantId " +
             "ORDER BY r.severity DESC, r.createdAt ASC")
     List<Recommendation> getByPlantId(@Param("plantId") Long plantId);
 
-    @Query("SELECT r FROM Recommendation r WHERE r.isResolved = false AND r.plant.idPlant = :plantId" +
+    @Query("SELECT r FROM Recommendation r WHERE r.resolved = false AND r.plant.id = :plantId " +
             "ORDER BY r.severity DESC, r.createdAt ASC")
     List<Recommendation> getUnresByPlantId(@Param("plantId") Long plantId);
 
-
-    @Query("SELECT r.plant.idPlant, COUNT(r) FROM Recommendation r " +
-            "WHERE r.isResolved = false " +
-            "GROUP BY r.plant.idPlant")
+    @Query("SELECT r.plant.id, COUNT(r) FROM Recommendation r " +
+            "WHERE r.resolved = false " +
+            "GROUP BY r.plant.id")
     List<Object[]> countUnresolvedByPlant();
 
-
-    @Query("SELECT  r.idRecommendation, r.plant.idPlant FROM Recommendation r " +
-            "WHERE r.isResolved = false ")
+    @Query("SELECT r.id, r.plant.id FROM Recommendation r WHERE r.resolved = false")
     List<Object[]> getUnresolved();
 
     @Modifying
     @Transactional
-    @Query("UPDATE Recommendation r SET r.isResolved = true, " +
-            "r.resolvedAt = CURRENT_TIMESTAMP, " +
-            "WHERE r.idRecommendation = :id")
+    @Query("UPDATE Recommendation r SET r.resolved = true, r.resolvedAt = CURRENT_TIMESTAMP WHERE r.id = :id")
     int resolve(@Param("id") Long id);
 
-    //разрешение всех рекомендаций для растения
     @Modifying
     @Transactional
-    @Query("UPDATE Recommendation r SET r.isResolved = true, r.resolvedAt = CURRENT_TIMESTAMP " +
-            "WHERE r.plant.idPlant = :plantId AND r.isResolved = false")
+    @Query("UPDATE Recommendation r SET r.resolved = true, r.resolvedAt = CURRENT_TIMESTAMP " +
+            "WHERE r.plant.id = :plantId AND r.resolved = false")
     int resolveAllByPlant(@Param("plantId") Long plantId);
 
-    @Query("SELECT COUNT(*) FROM Recommendation r " +
-            "WHERE r.isResolved = false ")
-    long countByIsResolvedFalse();
+    @Query("SELECT COUNT(r) FROM Recommendation r WHERE r.resolved = false")
+    long countByResolvedFalse();
 
-    long countByPlant_IdPlantAndIsResolvedFalse(Long plantId);
-
+    long countByPlant_IdAndResolvedFalse(Long plantId);
 
     @Query("SELECT r.severity, COUNT(r) FROM Recommendation r " +
-            "WHERE r.isResolved = false GROUP BY r.severity")
+            "WHERE r.resolved = false GROUP BY r.severity")
     List<Object[]> countUnresolvedBySeverity();
 
     @Modifying
     @Transactional
     @Query("DELETE FROM Recommendation r WHERE r.resolvedAt < :olderThan")
     int deleteOldResolved(@Param("olderThan") LocalDateTime olderThan);
-
-
 }

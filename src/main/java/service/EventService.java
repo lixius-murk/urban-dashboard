@@ -20,7 +20,7 @@ public class EventService {
     }
 
     public List<Event> getByPlantId(Long plantId) {
-        return eventRepository.findByPlant_IdPlantOrderByTimestampDesc(plantId);
+        return eventRepository.findByPlantId(plantId);
     }
 
     public Event logEvent(String type, String action, Long plantId) {
@@ -42,6 +42,6 @@ public class EventService {
     }
 
     public void markResolved(Long eventId) {
-        eventRepository.updateState(eventId, 2, null); // 2 = COMPLETED
+        eventRepository.updateState(eventId, 2); // 2 = COMPLETED
     }
 }

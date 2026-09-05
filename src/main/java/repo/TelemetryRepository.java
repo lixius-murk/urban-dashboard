@@ -1,6 +1,6 @@
 package repo;
 
-import  model.entity.Telemetry;
+import model.entity.Telemetry;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,46 +17,28 @@ import java.util.Optional;
 @Repository
 public interface TelemetryRepository extends JpaRepository<Telemetry, Long> {
 
-    List<Telemetry> findTop10ByPlant_IdPlantOrderByTimestampDesc(Long plantId);
+    List<Telemetry> findTop10ByPlant_IdOrderByTimestampDesc(Long plantId);
 
-    List<Telemetry> findByPlant_IdPlantAndTimestampBetweenOrderByTimestampAsc(
-            Long plantId, LocalDateTime from, LocalDateTime to);
+    List<Telemetry> findByPlant_IdAndTimestampBetweenOrderByTimestampAsc(Long plantId, LocalDateTime from, LocalDateTime to);
 
-    List<Telemetry> findBySensor_IdSensorOrderByTimestampDesc(Long sensorId);
+    // FIXED: Changed from findBySensor_IdTimestampDesc to findBySensor_IdOrderByTimestampDesc
+    List<Telemetry> findBySensor_IdOrderByTimestampDesc(Long sensorId);
 
-    @Query("SELECT t FROM Telemetry t WHERE t.plant.idPlant = :plantId " +
-            "AND t.sensor.sensorType.name = :sensorType " +
+    @Query("SELECT t FROM Telemetry t WHERE t.plant.id = :plantId " +
+            "AND t.sensor.type = :sensorType " +
             "ORDER BY t.timestamp DESC LIMIT 1")
-    Optional<Telemetry> findLatestByPlantAndSensorType(
-            @Param("plantId") Long plantId,
-            @Param("sensorType") String sensorType);
-
+    Optional<Telemetry> findLatestByPlantAndSensorType(@Param("plantId") Long plantId, @Param("sensorType") String sensorType);
 
     @Query("SELECT DISTINCT t FROM Telemetry t " +
             "WHERE t.timestamp = (SELECT MAX(t2.timestamp) FROM Telemetry t2 WHERE t2.plant = t.plant)")
     List<Telemetry> findAllLatestReadings();
 
-    @Query("SELECT t FROM Telemetry t WHERE t.plant.idPlant = :plantId " +
-            "ORDER BY t.timestamp DESC LIMIT 1")
+    @Query("SELECT t FROM Telemetry t WHERE t.plant.id = :plantId ORDER BY t.timestamp DESC LIMIT 1")
     Optional<Telemetry> findLatestByPlantId(@Param("plantId") Long plantId);
 
-    //средние показатели за последние 24 часа
-    @Query("SELECT AVG(t.temperature), AVG(t.humidityAir), AVG(t.soilMoisture), AVG(t.lightLux) " +
-            "FROM Telemetry t WHERE t.plant.idPlant = :plantId " +
-            "AND t.timestamp >= :since")
-    Object[] getAveragesSince(
-            @Param("plantId") Long plantId,
-            @Param("since") LocalDateTime since);
-
-    //выход за пределы норм
-    @Query("SELECT t FROM Telemetry t WHERE t.plant.idPlant = :plantId " +
-            "AND t.temperature IS NOT NULL " +
-            "AND (t.temperature < :minTemp OR t.temperature > :maxTemp)")
-    List<Telemetry> findTemperatureAnomalies(
-            @Param("plantId") Long plantId,
-            @Param("minTemp") Double minTemp,
-            @Param("maxTemp") Double maxTemp);
-
+    @Query("SELECT AVG(t.temp), AVG(t.humidity), AVG(t.soilMoisture), AVG(t.light) " +
+            "FROM Telemetry t WHERE t.plant.id = :plantId AND t.timestamp >= :since")
+    Object[] getAveragesSince(@Param("plantId") Long plantId, @Param("since") LocalDateTime since);
 
     @Modifying
     @Transactional
@@ -65,10 +47,10 @@ public interface TelemetryRepository extends JpaRepository<Telemetry, Long> {
 
     @Modifying
     @Transactional
-    void deleteByPlant_IdPlant(Long plantId);
+    void deleteByPlant_Id(Long plantId);
 
-    //паганация для бд
-    Page<Telemetry> findByPlant_IdPlantOrderByTimestampDesc(Long plantId, Pageable pageable);
+    @Query("SELECT t.temp, t.humidity, t.soilMoisture, t.light " +
+            "FROM Telemetry t WHERE t.plant.id = :plantId AND t.timestamp >= :since")
+    List<Telemetry> findByPlantIdDesc(Long plantId, LocalDateTime since);
 
-    Page<Telemetry> findBySensor_IdSensorOrderByTimestampDesc(Long sensorId, Pageable pageable);
 }

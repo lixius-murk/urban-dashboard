@@ -20,24 +20,16 @@ public class Telemetry {
     @JoinColumn(name = "id_sensor")
     private Sensor sensor;
 
-    private BigDecimal temp;
-    private Integer humidity;
-    private Integer soilMoisture;
-    private Integer light;
+    // These field names MUST match what the frontend expects
+    private BigDecimal temp;          // Frontend expects 'temp'
+    private Integer humidity;         // Frontend expects 'humidity'
+    private Integer soilMoisture;     // Frontend expects 'soilMoisture'
+    private Integer light;            // Frontend expects 'light'
+    private LocalDateTime timestamp;  // Frontend expects 'time'
 
-    private LocalDateTime timestamp;
+    private String source;
 
-    public Telemetry() {}
-
-    public Telemetry(PlantInstance plant, BigDecimal temp, Integer humidity, Integer soilMoisture, Integer light) {
-        this.plant = plant;
-        this.temp = temp;
-        this.humidity = humidity;
-        this.soilMoisture = soilMoisture;
-        this.light = light;
-        this.timestamp = LocalDateTime.now();
-    }
-
+    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -62,7 +54,9 @@ public class Telemetry {
     public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
 
-    public String getTime() {
-        return timestamp != null ? timestamp.toString() : null;
-    }
+    public String getSource() { return source; }
+    public void setSource(String source) { this.source = source; }
+
+    // Add this method for frontend compatibility
+    public LocalDateTime getTime() { return timestamp; }
 }

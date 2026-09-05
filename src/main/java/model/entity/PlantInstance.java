@@ -20,6 +20,8 @@ public class PlantInstance {
     @JoinColumn(name = "id_species")
     private PlantSpecies species;
 
+
+    private boolean active = true;
     private BigDecimal height;
     private Integer potSize;
     private Integer state = 0;  // 0-healthy, 1-needs attention
@@ -85,4 +87,12 @@ public class PlantInstance {
     }
 
     public Long getIdPlant() { return id; }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        active = active;
+    }
 }

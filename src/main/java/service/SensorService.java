@@ -17,7 +17,7 @@ public class SensorService {
     private SensorRepository sensorRepository;
 
     public List<Sensor> getSensorsByPlant(Long plantId) {
-        return sensorRepository.findByPlant_IdPlantAndIsActiveTrue(plantId);
+        return sensorRepository.findByPlant_IdAndActiveTrue(plantId);
     }
 
 
