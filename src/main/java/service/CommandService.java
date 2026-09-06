@@ -19,12 +19,11 @@ public class CommandService {
     @Autowired(required = false)
     private CommandRepository commandRepository;
 
-    public Command createCommand(PlantInstance plant, Event event, String commandType, Map<String, Object> payload) {
+    public Command createCommand(PlantInstance plant, Event event, String commandType) {
         Command command = new Command();
         command.setPlant(plant);
         command.setEvent(event);
         command.setCommandType(commandType);
-        command.setPayload(toJson(payload));
         command.setStatus("PENDING");
         command.setRetryCount(0);
         command.setMaxRetries(3);
@@ -33,7 +32,7 @@ public class CommandService {
     }
 
     public Command createManualCommand(PlantInstance plant, Event event, String commandType) {
-        return createCommand(plant, event, commandType, Map.of("trigger", "MANUAL"));
+        return createCommand(plant, event, commandType);
     }
 
 

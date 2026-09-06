@@ -11,11 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class WebSocketService {
 
-    // required = false: SimpMessagingTemplate only exists as a bean if
-    // spring-boot-starter-websocket + @EnableWebSocketMessageBroker are on
-    // the classpath. Without it, this stays null and pushes are skipped
-    // instead of breaking autowiring for every bean that depends on us
-    // (EventService, RecommendationService, ...).
+    //need tag for custom services
     @Autowired(required = false)
     private SimpMessagingTemplate messagingTemplate;
 

@@ -57,8 +57,8 @@
             color: #2d4a2d;
         }
 
-        .stat-card.attention .value { color: #e67e22; }
-        .stat-card.warning .value { color: #c0392b; }
+        .stat-card.attention .value { color: #ad6c35; }
+        .stat-card.warning .value { color: #9a2f29; }
 
         .card {
             background: #ededed;
@@ -102,8 +102,8 @@
         }
 
         .badge.healthy { background: #d4edda; color: #2d4a2d; }
-        .badge.attention { background: #fff3cd; color: #856404; }
-        .badge.danger { background: #f8d7da; color: #721c24; }
+        .badge.attention { background: #fff3cd; color: #ad6c35; }
+        .badge.danger { background: #f8d7da; color: #9a2f29; }
         .badge.info { background: #d1ecf1; color: #0c5460; }
 
         button {
@@ -162,8 +162,8 @@
             border-left: 4px solid #519657;
         }
 
-        .rec-item.warning { border-left-color: #ff9800; }
-        .rec-item.critical { border-left-color: #f44336; }
+        .rec-item.warning { border-left-color: #ad6c35; }
+        .rec-item.critical { border-left-color: #9a2f29; }
 
         .rec-message {
             font-size: 14px;
@@ -197,7 +197,6 @@
 <div class="container">
     <h1>
         Plantcare
-        <button onclick="refreshAll()" style="margin-left: auto;">Обновить</button>
     </h1>
 
     <div class="stats-grid" id="stats">
@@ -302,7 +301,7 @@
             }
         } catch (error) {
             console.error('Ошибка загрузки растений:', error);
-            document.getElementById('plantsList').innerHTML = '<p style="color: #b53838;">Ошибка загрузки</p>';
+            document.getElementById('plantsList').innerHTML = '<p style="color: #9a2f29;">Ошибка загрузки</p>';
         }
     }
 
@@ -414,11 +413,10 @@
         }
     }
 
-    // Функции действий
     async function waterPlant(id) {
         try {
             await fetch(`/api/plants/${id}/water`, { method: 'POST' });
-            alert('Полив выполнен!');
+            alert('Полив выполнен');
             await loadPlantDetails(id);
             await refreshAll();
         } catch (error) {
@@ -434,7 +432,6 @@
                 await fetch(`/api/plants/${currentPlantId}/recommendations/${recId}/resolve`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify('Решено пользователем')
                 });
                 await refreshAll();
                 if (currentPlantId) await loadPlantDetails(currentPlantId);

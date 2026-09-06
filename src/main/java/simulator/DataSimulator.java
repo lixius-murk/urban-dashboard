@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DataSimulator {
     private final Random random = new Random();
 
-    // Store last values for smooth changes
+    //last values for smooth changes
     private final Map<Long, DeviceState> deviceStates = new ConcurrentHashMap<>();
 
     public Telemetry generateTelemetry(PlantInstance plant, Sensor sensor) {
@@ -32,8 +32,7 @@ public class DataSimulator {
         telemetry.setTimestamp(LocalDateTime.now());
         telemetry.setSource("SIMULATOR");
 
-        // Set ALL values on every telemetry record
-        // This way the latest telemetry record always has all values
+        //all values on every telemetry record
         telemetry.setTemp(generateTemperature(plant, state));
         telemetry.setHumidity(generateHumidityAir(plant, state));
         telemetry.setSoilMoisture(generateSoilMoisture(plant, state));
@@ -80,19 +79,16 @@ public class DataSimulator {
         Integer min = getEffectiveSoilMoistureMin(plant);
         Integer max = getEffectiveSoilMoistureMax(plant);
 
-        // Evaporation rate
         double evaporationRate = 0.98;
         int newMoisture = prevMoisture != null
                 ? (int)(prevMoisture * evaporationRate)
                 : (min + max) / 2;
 
-        // Simulate watering if active
         if (state.isWateringActive()) {
             newMoisture = Math.min(newMoisture + 40, max);
             state.decrementWateringTimer();
         }
 
-        // Random variation
         newMoisture += random.nextInt(20) - 10;
         newMoisture = Math.max(min, Math.min(max, newMoisture));
 
@@ -121,7 +117,7 @@ public class DataSimulator {
         return Math.min(maxLight, Math.max(50, light));
     }
 
-    // Helper methods for effective thresholds
+    //for effective thresholds
     private BigDecimal getEffectiveTempMin(PlantInstance plant) {
         return plant.getTempMin() != null
                 ? plant.getTempMin()
@@ -142,7 +138,6 @@ public class DataSimulator {
         return plant.getSpecies().getSoilMoistureMax();
     }
 
-    // Inner class for device state
     private static class DeviceState {
         private BigDecimal lastTemperature;
         private Integer lastSoilMoisture;

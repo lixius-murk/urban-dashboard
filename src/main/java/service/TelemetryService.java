@@ -25,7 +25,7 @@ public class TelemetryService {
 
     public List<Telemetry> getHistory(Long plantId, int hours) {
         LocalDateTime from = LocalDateTime.now().minusHours(hours);
-        return telemetryRepository.findByPlant_IdAndTimestampBetweenOrderByTimestampAsc(plantId, from, LocalDateTime.now());
+        return telemetryRepository.findByPlantIdAndTimestampBetweenOrderByTimestampAsc(plantId, from, LocalDateTime.now());
     }
 
     public Object[] getAveragesSince(Long plantId, int hours) {

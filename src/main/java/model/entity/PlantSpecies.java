@@ -12,7 +12,6 @@ public class PlantSpecies {
     private Long id;
 
     private String name;
-    private String description;
 
     private BigDecimal tempMin = BigDecimal.valueOf(18);
     private BigDecimal tempMax = BigDecimal.valueOf(30);
@@ -34,9 +33,6 @@ public class PlantSpecies {
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
 
     public BigDecimal getTempMin() { return tempMin; }
     public void setTempMin(BigDecimal tempMin) { this.tempMin = tempMin; }

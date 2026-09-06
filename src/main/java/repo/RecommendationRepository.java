@@ -14,15 +14,12 @@ import java.util.List;
 @Repository
 public interface RecommendationRepository extends JpaRepository<Recommendation, Long> {
 
-    List<Recommendation> findByPlant_IdOrderByCreatedAtDesc(Long plantId);
-
 
     @Query("SELECT r FROM Recommendation r WHERE r.resolved = false " +
             "AND r.severity IN ('WARNING', 'CRITICAL') " +
             "ORDER BY r.severity DESC, r.createdAt ASC")
     List<Recommendation> findByResolvedFalseOrderByCreatedAtAsc();
 
-    List<Recommendation> findBySeverityOrderByCreatedAtDesc(String severity);
 
     @Query("SELECT r FROM Recommendation r WHERE r.resolved = false " +
             "AND r.severity IN ('WARNING', 'CRITICAL') " +

@@ -4,6 +4,7 @@ import model.entity.Command;
 import model.entity.Event;
 import model.entity.PlantInstance;
 import model.entity.Recommendation;
+import model.entity.RecommendationMsg;
 import model.entity.Telemetry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -69,7 +70,6 @@ public class LogicEngine {
             }
         }
 
-        // Save events
         List<Event> savedEvents = eventService.saveAll(triggeredEvents);
         for (Event event : savedEvents) {
             dispatchCommandFor(plant, event);
@@ -84,16 +84,13 @@ public class LogicEngine {
         Command command;
         switch (event.getType()) {
             case "WATERING":
-                command = commandService.createCommand(plant, event, "WATERING",
-                        Map.of("duration_seconds", 5, "amount_ml", 200));
+                command = commandService.createCommand(plant, event, "WATERING");
                 break;
             case "HEATING":
-                command = commandService.createCommand(plant, event, "HEATING",
-                        Map.of("duration_seconds", 10, "target_temp", getEffectiveTempMin(plant)));
+                command = commandService.createCommand(plant, event, "HEATING");
                 break;
             case "LIGHT_CONTROL":
-                command = commandService.createCommand(plant, event, "CURTAINS_OPEN",
-                        Map.of("action", "OPEN"));
+                command = commandService.createCommand(plant, event, "CURTAINS_OPEN");
                 break;
             default:
                 return;
@@ -148,9 +145,9 @@ public class LogicEngine {
             if (currentHeight.compareTo(potSize.multiply(BigDecimal.valueOf(0.9))) > 0) {
                 Recommendation rec = new Recommendation();
                 rec.setPlant(plant);
-                rec.setMessage(String.format("Растение достигло высоты %.1f см при размере горшка %d см. " +
+                rec.setMessage(new RecommendationMsg(String.format("Растение достигло высоты %.1f см при размере горшка %d см. " +
                                 "Рекомендуется пересадка в горшок %d см.",
-                        currentHeight, plant.getPotSize(), recommendedSize.intValue()));
+                        currentHeight, plant.getPotSize(), recommendedSize.intValue())));
                 rec.setSeverity("INFO");
                 rec.setCreatedAt(LocalDateTime.now());
                 rec.setResolved(false);

@@ -85,7 +85,6 @@ public class PlantInstance {
     public String getHealth() {
         return state == 0 ? "HEALTHY" : "NEEDS_ATTENTION";
     }
-
     public Long getIdPlant() { return id; }
 
     public boolean isActive() {

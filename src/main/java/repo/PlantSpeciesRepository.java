@@ -12,19 +12,8 @@ import java.util.Optional;
 @Repository
 public interface PlantSpeciesRepository extends JpaRepository<PlantSpecies, Long> {
 
-    Optional<PlantSpecies> findByName(String name);
-
-    List<PlantSpecies> findByNameContainingIgnoreCase(String name);
-
-    List<PlantSpecies> findAllByOrderByNameAsc();
-
-    List<PlantSpecies> findByTempMinLessThanEqual(Double maxTemp);
-
-    List<PlantSpecies> findByLightMinLessThanEqual(Integer maxLight);
-
     boolean existsByName(String name);
 
-    // FIXED: Removed references to non-existent 'instances' and 'isActive'
     @Query("SELECT s FROM PlantSpecies s")
     List<PlantSpecies> findAllWithInstances();
 

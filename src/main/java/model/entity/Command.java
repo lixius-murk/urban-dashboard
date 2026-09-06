@@ -22,9 +22,6 @@ public class Command {
 
     private String commandType; // WATERING, HEATING, CURTAINS_OPEN, ...
 
-    @Column(columnDefinition = "TEXT")
-    private String payload; // JSON-serialized command params
-
     private String status; // PENDING, SENT, ACKNOWLEDGED, FAILED, CANCELLED
     private Integer retryCount = 0;
     private Integer maxRetries = 3;
@@ -63,13 +60,7 @@ public class Command {
         this.commandType = commandType;
     }
 
-    public String getPayload() {
-        return payload;
-    }
 
-    public void setPayload(String payload) {
-        this.payload = payload;
-    }
 
     public String getStatus() {
         return status;

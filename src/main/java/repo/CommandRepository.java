@@ -24,7 +24,6 @@ public interface CommandRepository extends JpaRepository<Command, Long> {
     List<Command> findByCommandTypeOrderByCreatedAtDesc(String commandType);
 
 
-    // PENDING for what needs to be sent
     @Query("SELECT c FROM Command c WHERE c.status = 'PENDING' " +
             "AND c.retryCount < c.maxRetries " +
             "ORDER BY c.createdAt ASC")

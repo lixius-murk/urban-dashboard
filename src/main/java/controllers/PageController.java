@@ -12,11 +12,6 @@ public class PageController {
     }
 
 
-    @GetMapping("/privacy")
-    public String privacy() {
-        return "privacy";
-    }
-
     @GetMapping("/admin/dashboard")
     public String adminDashboard() {
         return "admin/dashboard";

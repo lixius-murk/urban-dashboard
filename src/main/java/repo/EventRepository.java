@@ -16,18 +16,10 @@ import java.util.List;
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
 
-    List<Event> findByPlantIdOrderByTimeDesc(Long plantId);
-
-    List<Event> findTop10ByPlantIdOrderByTimeDesc(Long plantId);
-
-    List<Event> findByTypeOrderByTimeDesc(String type);
-
-    List<Event> findByStatus(Integer status);
 
     @Query("SELECT e FROM Event e WHERE e.status IN (0, 1) ORDER BY e.id DESC")
     List<Event> findPendingEvents();
 
-    List<Event> findByPlantIdAndTimeBetweenOrderByTimeDesc(Long plantId, LocalDateTime from, LocalDateTime to);
 
     @Query("SELECT e FROM Event e ORDER BY e.time DESC LIMIT 20")
     List<Event> findLast20Events();

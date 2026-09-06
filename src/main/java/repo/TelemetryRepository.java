@@ -17,11 +17,9 @@ import java.util.Optional;
 @Repository
 public interface TelemetryRepository extends JpaRepository<Telemetry, Long> {
 
-    List<Telemetry> findTop10ByPlant_IdOrderByTimestampDesc(Long plantId);
 
-    List<Telemetry> findByPlant_IdAndTimestampBetweenOrderByTimestampAsc(Long plantId, LocalDateTime from, LocalDateTime to);
+    List<Telemetry> findByPlantIdAndTimestampBetweenOrderByTimestampAsc(Long plantId, LocalDateTime from, LocalDateTime to);
 
-    // FIXED: Changed from findBySensor_IdTimestampDesc to findBySensor_IdOrderByTimestampDesc
     List<Telemetry> findBySensor_IdOrderByTimestampDesc(Long sensorId);
 
     @Query("SELECT t FROM Telemetry t WHERE t.plant.id = :plantId " +
